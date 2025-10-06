@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visa Fee Tracker</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #e8eaf6);
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #003366;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    input, select {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: #003366;
+      outline: none;
+      box-shadow: 0 0 5px rgba(0,51,102,0.2);
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    button {
+      flex: 1;
+      margin: 5px;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .btn-calc {
+      background: #003366;
+      color: white;
+    }
+
+    .btn-calc:hover {
+      background: #004b8d;
+    }
+
+    .btn-reset {
+      background: #ddd;
+      color: #333;
+    }
+
+    .btn-reset:hover {
+      background: #bbb;
+    }
+
+    .result-card {
+      margin-top: 30px;
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 12px;
+      border-left: 6px solid #003366;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .result-card h2 {
+      color: #003366;
+      margin-bottom: 15px;
+    }
+
+    .result-card p {
+      margin: 5px 0;
+      font-size: 1rem;
+    }
+
+    .result-card .total {
+      font-size: 1.2rem;
+      color: #004b8d;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Visa Fee Tracker</h1>
+    <div class="card">
+      <div class="form-group">
+        <label for="passengerId">Passenger ID</label>
+        <input type="text" id="passengerId" placeholder="Enter Passenger ID">
+      </div>
+
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" placeholder="Enter Passenger Name">
+      </div>
+
+      <div class="form-group">
+        <label for="filingDate">Filing Date</label>
+        <input type="date" id="filingDate">
+      </div>
+
+      <div class="form-group">
+        <label for="country">Country</label>
+        <select id="country">
+          <option value="">-- Select Country --</option>
+          <option value="Thailand">Thailand</option>
+          <option value="Dubai">Dubai</option>
+          <option value="USA">USA</option>
+          <option value="Japan">Japan</option>
+          <option value="Russia">Russia</option>
+        </select>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn-calc" onclick="calculateVisa()">Calculate Fee</button>
+        <button class="btn-reset" onclick="resetForm()">Reset</button>
+      </div>
+    </div>
+
+    <div id="result" class="result-card" style="display:none;"></div>
+  </div>
+
+  <script>
+    const BASE_COST = 3000;
+    const COUNTRY_ORDER = {
+      "Thailand": 1,
+      "Dubai": 2,
+      "USA": 3,
+      "Japan": 4,
+      "Russia": 5
+    };
+
+    function fmtINR(amount) {
+      return amount.toLocaleString("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 2
+      });
+    }
+
+    function calculateVisa() {
+      const passengerId = document.getElementById("passengerId").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const filingDate = document.getElementById("filingDate").value;
+      const country = document.getElementById("country").value;
+
+      if (!passengerId || !name || !filingDate || !country) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      const order = COUNTRY_ORDER[country];
+      const additional = 4 * order;
+      const total = BASE_COST + additional;
+
+      const resultDiv = document.getElementById("result");
+      resultDiv.style.display = "block";
+      resultDiv.innerHTML = `
+        <h2>Visa Cost Details</h2>
+        <p><strong>Passenger ID:</strong> ${passengerId}</p>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Filing Date:</strong> ${filingDate}</p>
+        <p><strong>Country:</strong> ${country}</p>
+        <p><strong>Country Order:</strong> ${order}</p>
+        <p><strong>Base Cost:</strong> ${fmtINR(BASE_COST)}</p>
+        <p><strong>Additional Cost:</strong> ${fmtINR(additional)}</p>
+        <p class="total"><strong>Total Visa Cost:</strong> ${fmtINR(total)}</p>
+      `;
+    }
+
+    function resetForm() {
+      document.getElementById("passengerId").value = "";
+      document.getElementById("name").value = "";
+      document.getElementById("filingDate").value = "";
+      document.getElementById("country").value = "";
+      document.getElementById("result").style.display = "none";
+    }
+  </script>
+</body>
+</html>
